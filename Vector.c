@@ -141,8 +141,9 @@ void printHelp()
     printf("c = a . b  | Uses vectors a and b (prints result) of the dot product and create vector c\n");
     printf("c = a x b  | Uses vectors a and b (prints result) of the cross product and create vector c\n");
     printf("a | Display single vectors current values\n");
-    printf("help  | Show this help menu\n");
-    printf("quit  | Exit the program\n");
+    printf("help       | Show this help menu\n");
+    printf("quit       | Exit the program\n");
+    printf("Hello from step 8");
 }
 
 

@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
         printHelp();
         return 0;
     }
+    printf("Hello from step 7");
     commandInput();
     return 0;
 }

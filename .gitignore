@@ -2,6 +2,6 @@
 *.o
 # Dependency Files
 *.d
-# Executable File
+# Executable files
 Lab5
 
