@@ -1,20 +1,23 @@
 /**
  * Author: Giovanni Guaman
- * Filename: vector.h
+ * Filename: main.c
  * Date: 10/01/25
- * Description: Declaring the variables for the vector function
- * To compile: gcc -o mini_matlab vector.c main.c
+ * Description: The main source file to run the program
+ * To compile: gcc -o Lab5 vector.c main.c
  */
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "vector.h"
 
 int main(int argc, char *argv[]) {
+    initVectorStorage();
+    atexit(cleanupVectors); // ensures memory freed on exit
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
         printHelp();
         return 0;
     }
-    printf("Hello from step 7");
     commandInput();
     return 0;
 }

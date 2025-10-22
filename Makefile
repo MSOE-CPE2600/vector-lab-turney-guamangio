@@ -1,9 +1,9 @@
 CC=gcc
 CFLAGS=-c -Wall
-LDFLAGS= 
+LDFLAGS=
 SOURCES= Vector.c main.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE= Lab5
+EXECUTABLE= Lab7
 
 all: $(SOURCES) $(EXECUTABLE) 
 

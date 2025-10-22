@@ -8,19 +8,26 @@
 #ifndef VECTOR_H 
 #define VECTOR_H
 
-#define MAX_VECTORS 10
 #define MAX_TOKENS 100
+
 
 typedef struct 
 {
     char name;
     float x, y, z;
-    int valid;
+    int valid; // checks to see if the vectors can be added to the list
 } Vector;
 
+Vector *vectors;
+int vectorCount;
+int capacity;
 
 
+//Initialization and cleanup
+void initVectorStorage();
+void cleanupVectors();
 
+//Vector Functions 
 Vector add(Vector a, Vector b);
 Vector subtract(Vector a, Vector b);
 Vector sMult(Vector a, double s);
@@ -35,6 +42,11 @@ void addVector(char name, double x, double y, double z);
 void listVectors();
 void clearVectors();
 void printHelp();
+
+//Saving the Vectors and Loading them
+void saveVectors(char *filename);
+void loadVectors(char *filename);
+
 
 //interface
 void commandInput();

@@ -11,7 +11,33 @@
 #include <ctype.h> 
 #include "vector.h"
 
-Vector vectors[MAX_VECTORS];
+
+Vector *vectors = NULL;
+int vectorCount = 0;
+int capacity = 0;
+
+
+//Initialization and cleanup
+void initVectorStorage(){
+    capacity = 4;
+    if(vectorCount > capacity) {
+        capacity *= 2;
+        vectors = malloc(capacity * sizeof(Vector));
+        if(!vectors){
+            printf("Error: Memory Allocation Failed!");
+            exit(1);
+        }
+    }
+
+
+}
+void cleanupVectors(){
+    free(vectors);
+    vectors = NULL;
+    vectorCount = 0;
+    capacity = 0;
+}
+
 
 // Tokenizer function
 int tokenize(char *input, char *tokens[]) {
@@ -70,7 +96,7 @@ Vector crossProd(Vector a, Vector b) {
 
 // Vector storage
 int findVector(char name) {
-    for (int i = 0; i < MAX_VECTORS; i++) {
+    for (int i = 0; i < vectorCount; i++) {
         if (vectors[i].valid && vectors[i].name == name) {
             return i;
         }
@@ -81,28 +107,32 @@ int findVector(char name) {
 void addVector(char name, double x, double y, double z) {
     int index = findVector(name);
     if (index == -1) {
-        for (int i = 0; i < MAX_VECTORS; i++) {
-            if (!vectors[i].valid) {
-                vectors[i].name = name;
-                vectors[i].x = x;
-                vectors[i].y = y;
-                vectors[i].z = z;
-                vectors[i].valid = 1;
-                printf("%c = %.2f %.2f %.2f\n", name, x, y, z);
-                return;
-            }
-        }
-        printf("Vector array is full\n");
-    } else {
         vectors[index].x = x;
         vectors[index].y = y;
         vectors[index].z = z;
         printf("%c updated = %.2f %.2f %.2f\n", name, x, y, z);
+        return;
     }
+
+    if(vectorCount == capacity){
+        capacity *= 2;
+        vectors = realloc(vectors, capacity * sizeof(Vector));
+        if(!vectors){
+            printf("Error: Memory Allocation Failed");
+            exit(1);
+        }
+    }
+    vectors[vectorCount].name = name;
+    vectors[vectorCount].x = x;
+    vectors[vectorCount].y = y;
+    vectors[vectorCount].z = z;
+    vectors[vectorCount].valid = 1;
+    vectorCount++;
+    printf("%c = %.2f %.2f %.2f\n", name, x, y, z);
 }
 
 void listVectors() {
-    for (int i = 0; i < MAX_VECTORS; i++) {
+    for (int i = 0; i < vectorCount; i++) {
         if (vectors[i].valid) {
             printf("%c = %.2f %.2f %.2f\n", vectors[i].name, vectors[i].x, vectors[i].y, vectors[i].z);
         }
@@ -110,10 +140,50 @@ void listVectors() {
 }
 
 void clearVectors() {
-    for (int i = 0; i < MAX_VECTORS; i++) {
-        vectors[i].valid = 0;
-    }
+    free(vectors);
+    initVectorStorage();
     printf("All vectors cleared.\n");
+}
+
+
+//Saving the Vectors and Loading them
+void saveVectors(char *filename){
+
+FILE *fp = fopen(filename, "w");
+    if(!fp)
+    {
+        printf("Error: Couldn't write to file.\n", filename);
+    }
+
+
+    for (int i = 0; i < vectorCount; i++) {
+        if (vectors[i].valid) {
+            fprintf(fp, "%c = %.2f %.2f %.2f\n", vectors[i].name, vectors[i].x, vectors[i].y, vectors[i].z);
+        }
+    }
+    fclose(fp);
+    printf("Printed vectors to %s\n", filename);
+
+}
+
+void loadVectors(char *filename){
+    FILE *fp = fopen(filename, "r");
+    if(fp == NULL){
+        printf("Error opening file from %s\n", filename);
+        return;
+    } 
+    char line[128];
+    while (fgets(line, sizeof(line), fp)) {
+        if (strlen(line) < 3) continue;
+        char name;
+        double x, y, z;
+        if (sscanf(line, " %c , %lf , %lf , %lf", &name, &x, &y, &z) == 4) {
+            addVector(name, x, y, z);
+        } else {
+            printf("Warning: Skipping malformed line: %s", line);
+        }
+    }
+    printf("Vectors loaded from %s\n",filename);
 }
 
 // Char Remover for the ','
@@ -143,7 +213,8 @@ void printHelp()
     printf("a | Display single vectors current values\n");
     printf("help       | Show this help menu\n");
     printf("quit       | Exit the program\n");
-    printf("Hello from step 8");
+    printf("save       | Save the vectors to a file");
+    printf("load       | load vectors from a file to the list");
 }
 
 
@@ -182,6 +253,16 @@ void commandInput() {
         // Clear
         else if (strcmp(tokens[0], "clear") == 0){ 
             clearVectors();
+        }
+
+        // Save
+        else if (strcmp(tokens[0], "save") == 0 && tokenCount == 2){ 
+            saveVectors(tokens[1]);
+        }
+
+        // Load
+        else if (strcmp(tokens[0], "load") == 0 && tokenCount == 2){ 
+            loadVectors(tokens[1]);
         }
 
         
@@ -431,6 +512,6 @@ void commandInput() {
             printf("Invalid command.\n");
         }
     }
-
+    
     printf("Goodbye!\n");
 }
