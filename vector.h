@@ -18,11 +18,6 @@ typedef struct
     int valid; // checks to see if the vectors can be added to the list
 } Vector;
 
-Vector *vectors;
-int vectorCount;
-int capacity;
-
-
 //Initialization and cleanup
 void initVectorStorage();
 void cleanupVectors();

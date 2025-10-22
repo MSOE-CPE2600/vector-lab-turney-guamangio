@@ -12,12 +12,12 @@
 #include "vector.h"
 
 int main(int argc, char *argv[]) {
-    initVectorStorage();
-    atexit(cleanupVectors); // ensures memory freed on exit
     if (argc > 1 && strcmp(argv[1], "-h") == 0) {
         printHelp();
         return 0;
     }
+    initVectorStorage();
     commandInput();
+    cleanupVectors();
     return 0;
 }

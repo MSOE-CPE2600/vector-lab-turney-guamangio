@@ -20,22 +20,21 @@ int capacity = 0;
 //Initialization and cleanup
 void initVectorStorage(){
     capacity = 4;
-    if(vectorCount > capacity) {
-        capacity *= 2;
-        vectors = malloc(capacity * sizeof(Vector));
-        if(!vectors){
-            printf("Error: Memory Allocation Failed!");
-            exit(1);
-        }
+    vectorCount = 0;
+    vectors = malloc(capacity * sizeof(Vector));
+    if (!vectors) {
+        printf("Error: Memory Allocation Failed!\n");
+        exit(1);
     }
-
-
 }
+
+
 void cleanupVectors(){
     free(vectors);
     vectors = NULL;
     vectorCount = 0;
     capacity = 0;
+    printf("Vectors are cleared\n");
 }
 
 
@@ -106,7 +105,7 @@ int findVector(char name) {
 
 void addVector(char name, double x, double y, double z) {
     int index = findVector(name);
-    if (index == -1) {
+    if (index != -1) {
         vectors[index].x = x;
         vectors[index].y = y;
         vectors[index].z = z;
@@ -122,6 +121,7 @@ void addVector(char name, double x, double y, double z) {
             exit(1);
         }
     }
+
     vectors[vectorCount].name = name;
     vectors[vectorCount].x = x;
     vectors[vectorCount].y = y;
@@ -140,27 +140,28 @@ void listVectors() {
 }
 
 void clearVectors() {
-    free(vectors);
-    initVectorStorage();
+    for (int i = 0; i < vectorCount; i++) {
+        vectors[i].valid = 0;
+    }
     printf("All vectors cleared.\n");
 }
 
 
 //Saving the Vectors and Loading them
 void saveVectors(char *filename){
-
 FILE *fp = fopen(filename, "w");
-    if(!fp)
-    {
-        printf("Error: Couldn't write to file.\n", filename);
-    }
 
+    if(!fp){
+        printf("Error: Couldn't write to file: %s\n", filename);
+        return;
+    }
 
     for (int i = 0; i < vectorCount; i++) {
         if (vectors[i].valid) {
-            fprintf(fp, "%c = %.2f %.2f %.2f\n", vectors[i].name, vectors[i].x, vectors[i].y, vectors[i].z);
+            fprintf(fp, "%c=%.2f,%.2f,%.2f\n", vectors[i].name, vectors[i].x, vectors[i].y, vectors[i].z);
         }
     }
+
     fclose(fp);
     printf("Printed vectors to %s\n", filename);
 
@@ -168,28 +169,44 @@ FILE *fp = fopen(filename, "w");
 
 void loadVectors(char *filename){
     FILE *fp = fopen(filename, "r");
-    if(fp == NULL){
-        printf("Error opening file from %s\n", filename);
+    //checks if file is there.
+    if (!fp) {
+        printf("Error opening file: %s\n", filename);
         return;
-    } 
+    }
+
     char line[128];
+
+    //reads the line of the csv file
     while (fgets(line, sizeof(line), fp)) {
-        if (strlen(line) < 3) continue;
+
+        //Skips the empty lines that may be present in the .csv file
+        if (strlen(line) < 3) {
+            continue;
+        }
+
+        //creates variable to added to the list later.
         char name;
         double x, y, z;
-        if (sscanf(line, " %c , %lf , %lf , %lf", &name, &x, &y, &z) == 4) {
+
+        //Checks if the format is exactly this from the file?
+        if (sscanf(line, "%c=%lf,%lf,%lf", &name, &x, &y, &z) == 4) {
             addVector(name, x, y, z);
         } else {
-            printf("Warning: Skipping malformed line: %s", line);
+            printf("Skipping invalid line: %s", line);
         }
     }
-    printf("Vectors loaded from %s\n",filename);
+    fclose(fp);
+    printf("Vectors loaded from %s\n", filename);
 }
+
 
 // Char Remover for the ','
 void char_remover(char *s) {
     for (int i = 0; s[i] != '\0'; i++) {
-        if (s[i] == ',') s[i] = ' ';
+        if (s[i] == ','){
+            s[i] = ' ';
+        }
     }
 }
 
@@ -197,24 +214,26 @@ void char_remover(char *s) {
 void printHelp() 
 {
     printf("\n=== MiniMat Vector Calculator Help ===\n");
-    printf("a = 1 2 3 | Create vector a with values (1, 2, 3)\n");
-    printf("list | List all stored vectors\n");
-    printf("clear | Clear all vectors\n");
+    printf("a = 1 2 3  | Create vector a with values (1, 2, 3)\n");
+    printf("list   | List all stored vectors\n");
+    printf("clear  | Clear all vectors\n");
     printf("a + b  | Add vectors a and b (prints result) and creates a vector\n");
     printf("a - b  | Subtract vector b from a (prints result) and creates a vector\n");
     printf("a * 3 or 3 * a | Multiply vector a by scalar 3 (prints result) and creates a vector\n");
     printf("a . b  | Compute dot product of a and b and prints result.\n");
     printf("a x b  | Compute cross product of a and b (prints result) and creates a vector\n");
-    printf("c = a + b | Store result of a + b into new vector c\n");
-    printf("c = a - b | Subtracts vectors a and b (prints result) and create vector c\n");
+    printf("c = a + b  | Store result of a + b into new vector c\n");
+    printf("c = a - b  | Subtracts vectors a and b (prints result) and create vector c\n");
     printf("c = a * b  | multiplies vectors a and b (prints result) and create vector c\n");
     printf("c = a . b  | Uses vectors a and b (prints result) of the dot product and create vector c\n");
     printf("c = a x b  | Uses vectors a and b (prints result) of the cross product and create vector c\n");
     printf("a | Display single vectors current values\n");
     printf("help       | Show this help menu\n");
     printf("quit       | Exit the program\n");
-    printf("save       | Save the vectors to a file");
-    printf("load       | load vectors from a file to the list");
+    printf("save 'vector name'.csv  | Save the vectors to a file of the .csv variety\n");
+    printf("Example: 'save vectors.csv' = vectors.csv\n");
+    printf("load  'filename'    | load vectors from a file to the list in .csv\n");
+    printf("Example: 'load vectors.csv'\n");
 }
 
 
