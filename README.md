@@ -1,6 +1,6 @@
 Vector Calculator Update 3 for GIT
 
-This program is a upgrade to our Lab 5 and
+This program is a upgrade to our Lab 5 and have added the function to read and save the vectors you make in the lab to a .csv file.
 
 To build the program you would need to make the files using 'make' and to clear them you need to use 'make clean'. You can also use gcc -o "what you want to name it" main.c Vector.c 
 
@@ -27,6 +27,5 @@ Here are some of the list of commands that you can input in the program
     load       | load vectors from a file to the list
 
   
-
-
-short description 
+short description of the dynamic memory
+The program first starts up by creating a base capacity of vectors you can input to the program, but the once you reach the limit the program will reallocate it self in order to give you more space to make new vectors. After you have finished with the program, the function clearVectors will happen after the command interface function to free up any memory that the program has made and exit smoothly.

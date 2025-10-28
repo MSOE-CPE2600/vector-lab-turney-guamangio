@@ -158,7 +158,7 @@ FILE *fp = fopen(filename, "w");
 
     for (int i = 0; i < vectorCount; i++) {
         if (vectors[i].valid) {
-            fprintf(fp, "%c=%.2f,%.2f,%.2f\n", vectors[i].name, vectors[i].x, vectors[i].y, vectors[i].z);
+            fprintf(fp, "%c, %.2f, %.2f, %.2f\n", vectors[i].name, vectors[i].x, vectors[i].y, vectors[i].z);
         }
     }
 
@@ -190,7 +190,7 @@ void loadVectors(char *filename){
         double x, y, z;
 
         //Checks if the format is exactly this from the file?
-        if (sscanf(line, "%c=%lf,%lf,%lf", &name, &x, &y, &z) == 4) {
+        if (sscanf(line, "%c, %lf, %lf, %lf", &name, &x, &y, &z) == 4) {
             addVector(name, x, y, z);
         } else {
             printf("Skipping invalid line: %s", line);
